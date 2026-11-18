@@ -2,7 +2,7 @@ import tailwindcss from '@tailwindcss/vite'
 
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
-  modules: ['shadcn-nuxt'],
+  modules: ['shadcn-nuxt', '@nuxt/eslint'],
   compatibilityDate: '2025-07-15',
   devtools: { enabled: true },
   css: ['~/assets/css/tailwind.css'],
@@ -24,5 +24,11 @@ export default defineNuxtConfig({
      * @default "@/components/ui"
      */
     componentDir: '@/components/ui'
+  },
+  eslint: {
+    config: {
+      // Let @antfu/eslint-config own the base + stylistic rules
+      standalone: false,
+    },
   }
 })
