@@ -1,0 +1,15 @@
+{
+  // Typechecks code that runs outside Nuxt (CLI scripts, tests, tool configs).
+  // App and server code is checked by `nuxt typecheck`.
+  "compilerOptions": {
+    "target": "ES2023",
+    "module": "preserve",
+    "moduleResolution": "bundler",
+    "types": ["node"],
+    "strict": true,
+    "noUncheckedIndexedAccess": true,
+    "noEmit": true,
+    "skipLibCheck": true
+  },
+  "include": ["scripts/**/*.ts", "tests/**/*.ts", "drizzle.config.ts", "vitest.config.ts"]
+}
