@@ -1,75 +1,58 @@
-# Nuxt Minimal Starter
+# Recreation Facility Booking
 
-Look at the [Nuxt documentation](https://nuxt.com/docs/getting-started/introduction) to learn more.
+A simple, multi-tenant booking platform for facilities that rent spaces by the hour. One Nuxt 4 app (Vue + Nitro) on PostgreSQL 18.
 
-## Setup
+- Product brief: [docs/FACILITY_BOOKING_MVP.md](docs/FACILITY_BOOKING_MVP.md)
+- Decisions: [docs/DECISIONS.md](docs/DECISIONS.md) · Architecture: [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) · API: [docs/API_ENDPOINTS.md](docs/API_ENDPOINTS.md) · Backlog: [docs/BACKLOG.md](docs/BACKLOG.md)
 
-Make sure to install dependencies:
+## Local setup
+
+Requirements: Node 24 (`.nvmrc`), pnpm, and two local Docker containers:
 
 ```bash
-# npm
-npm install
+docker run -d --name recreation-postgres -e POSTGRES_PASSWORD=postgres -p 127.0.0.1:5432:5432 \
+  -v recreation-pgdata:/var/lib/postgresql postgres:18
+docker run -d --name recreation-mailpit -p 127.0.0.1:1025:1025 -p 127.0.0.1:8025:8025 axllent/mailpit
+```
 
-# pnpm
+```bash
 pnpm install
-
-# yarn
-yarn install
-
-# bun
-bun install
+cp .env.example .env          # then set your database credentials
+pnpm db:reset                 # create recreation_dev, migrate, seed demo data
+pnpm dev                      # http://localhost:3000
 ```
 
-## Development Server
+Sign in at `/auth/login` with any seeded user (password `password123`):
 
-Start the development server on `http://localhost:3000`:
+| Email | Access |
+|---|---|
+| `owner@demo.test` | Owner of Maple Sports Centre |
+| `riverside-owner@demo.test` | Owner of Riverside Community Hall |
+| `staff@demo.test` | Staff at both organizations |
+| `admin@demo.test` | Superadmin |
+
+Emails (setup links, password resets) land in Mailpit at http://localhost:8025. Without `NUXT_SMTP_HOST` they're printed to the server console.
+
+## Scripts
+
+| Command | What it does |
+|---|---|
+| `pnpm test` | Vitest against `TEST_DATABASE_URL` (created and migrated automatically) |
+| `pnpm typecheck` / `pnpm lint` | Type and lint checks |
+| `pnpm db:generate --name <name>` | Generate a SQL migration from schema changes (review it, then commit) |
+| `pnpm db:migrate` | Apply migrations |
+| `pnpm db:seed` / `pnpm db:reset` | Seed / wipe + migrate + seed (local databases only) |
+| `pnpm db:studio` | Browse the database |
+
+## Provisioning (founder only)
+
+Organizations are created by CLI — there is no public signup during the pilot.
 
 ```bash
-# npm
-npm run dev
-
-# pnpm
-pnpm dev
-
-# yarn
-yarn dev
-
-# bun
-bun run dev
+pnpm admin:create-org --name "Maple Sports" --slug maple-sports \
+  --owner-email jamie@example.com --owner-name "Jamie Lee" --timezone America/Toronto
+pnpm admin:resend-setup --email jamie@example.com
+pnpm admin:grant-superadmin --email you@example.com --name "Your Name"
 ```
 
-## Production
-
-Build the application for production:
-
-```bash
-# npm
-npm run build
-
-# pnpm
-pnpm build
-
-# yarn
-yarn build
-
-# bun
-bun run build
-```
-
-Locally preview production build:
-
-```bash
-# npm
-npm run preview
-
-# pnpm
-pnpm preview
-
-# yarn
-yarn preview
-
-# bun
-bun run preview
-```
-
-Check out the [deployment documentation](https://nuxt.com/docs/getting-started/deployment) for more information.
+Each command prints the setup link as well as emailing it.
